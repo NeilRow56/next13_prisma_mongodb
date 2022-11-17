@@ -6,6 +6,56 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+
+  firstName       String   
+  lastName        String
+  email           String
+  productIDs      String[]   @db.ObjectId
+  products        Product[] @relation(fields: [productIDs], references: [id])
+
+  reviewIDs      String[]   @db.ObjectId
+  reviews        Review[] @relation(fields: [reviewIDs], references: [id])
+           
+}
+
+// Many to many relationships - A user has many products. A product has many users
+
+model Product {
+
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  name            String   
+  description     String
+  image           String
+  price           Int 
+  userIDs         String[] @db.ObjectId
+  users           User[]   @relation(fields: [userIDs], references: [id])
+
+  reviews         Review[]
+  
+}
+
+model Review {
+  id              String  @id @default(auto()) @map("_id") @db.ObjectId
+  rating          Int 
+  text            String
+
+  userIDs         String[] @db.ObjectId
+  users           User[]   @relation(fields: [userIDs], references: [id])
+
+  product         Product   @relation(fields: [productId], references: [id])
+  productId       String @db.ObjectId
+
+
+  
+ 
+
+  
+}
+
+
